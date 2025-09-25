@@ -6,6 +6,7 @@ interface CreateUserBody {
   email: string;
 }
 
+
 export const createUser = async (req: Request<{}, {}, CreateUserBody>, res: Response) => {
   const { name, email } = req.body;
 
@@ -14,9 +15,16 @@ export const createUser = async (req: Request<{}, {}, CreateUserBody>, res: Resp
   }
 
   try {
-    const user = db.insertUser
-      ? await db.insertUser(name, email)                     // mock
-      : await db("users").insert({ name, email }).returning(["id", "name", "email"]); // real
+    let user;
+
+    if (db.insertUser) {
+      // mock DB
+      user = await db.insertUser(name, email);
+    } else {
+      // MySQL / real DB
+      const [id] = await db("users").insert({ name, email }); // insert returns the inserted ID
+      user = await db("users").where("id", id).first();        // fetch the created user
+    }
 
     res.status(201).json({ message: "User created successfully", user });
   } catch (err: any) {

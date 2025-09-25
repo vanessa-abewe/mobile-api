@@ -3,6 +3,7 @@ import cors from "cors";
 import swaggerUi from "swagger-ui-express";
 import swaggerJsdoc from "swagger-jsdoc";
 import userRoutes from "./routes/user";
+import categories2Routes from "./routes/categories2";
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -26,4 +27,5 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 // Routes
 
 app.use("/users", userRoutes);
+app.use("/categories2", categories2Routes);
 export default app;
