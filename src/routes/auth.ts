@@ -1,5 +1,5 @@
 import { Router } from "express"
-import { signup, login, verifyOTP, forgotPassword, resetPassword } from "../controllers/AuthController"
+import { signup, login, verifyOTP, forgotPassword, resetPassword } from "../controllers/auth.controller"
 
 const router = Router()
 
@@ -16,30 +16,48 @@ const router = Router()
  *           schema:
  *             type: object
  *             required:
- *               - email
  *               - password
- *               - firstName
- *               - lastName
  *             properties:
  *               email:
  *                 type: string
  *                 format: email
+ *                 description: Either email or phone is required (but not both)
+ *                 example: user@example.com
+ *               phone:
+ *                 type: string
+ *                 description: Either email or phone is required (but not both)
+ *                 example: "+1234567890"
  *               password:
  *                 type: string
  *                 minLength: 6
- *               firstName:
- *                 type: string
- *               lastName:
- *                 type: string
- *               phone:
- *                 type: string
+ *                 example: "password123"
  *     responses:
  *       201:
  *         description: User created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     userId:
+ *                       type: integer
+ *                     email:
+ *                       type: string
+ *                     phone:
+ *                       type: string
+ *                     isVerified:
+ *                       type: boolean
  *       400:
- *         description: Validation error
+ *         description: Validation error - either email or phone with password required
  *       409:
- *         description: User already exists
+ *         description: User already exists with this email or phone
  */
 router.post("/signup", signup)
 
@@ -56,17 +74,50 @@ router.post("/signup", signup)
  *           schema:
  *             type: object
  *             required:
- *               - email
  *               - password
  *             properties:
  *               email:
  *                 type: string
  *                 format: email
+ *                 description: Either email or phone is required (but not both)
+ *                 example: user@example.com
+ *               phone:
+ *                 type: string
+ *                 description: Either email or phone is required (but not both)
+ *                 example: "+1234567890"
  *               password:
  *                 type: string
+ *                 example: "password123"
  *     responses:
  *       200:
  *         description: Login successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     token:
+ *                       type: string
+ *                     user:
+ *                       type: object
+ *                       properties:
+ *                         id:
+ *                           type: integer
+ *                         email:
+ *                           type: string
+ *                         phone:
+ *                           type: string
+ *                         isVerified:
+ *                           type: boolean
+ *       400:
+ *         description: Either email or phone with password required
  *       401:
  *         description: Invalid credentials
  *       403:
@@ -87,17 +138,48 @@ router.post("/login", login)
  *           schema:
  *             type: object
  *             required:
- *               - email
  *               - otp
  *             properties:
  *               email:
  *                 type: string
  *                 format: email
+ *                 description: Either email or phone is required (but not both)
+ *                 example: user@example.com
+ *               phone:
+ *                 type: string
+ *                 description: Either email or phone is required (but not both)
+ *                 example: "+1234567890"
  *               otp:
  *                 type: string
+ *                 example: "123456"
  *     responses:
  *       200:
  *         description: Account verified successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     token:
+ *                       type: string
+ *                     user:
+ *                       type: object
+ *                       properties:
+ *                         id:
+ *                           type: integer
+ *                         email:
+ *                           type: string
+ *                         phone:
+ *                           type: string
+ *                         isVerified:
+ *                           type: boolean
  *       400:
  *         description: Invalid or expired OTP
  *       404:
@@ -117,15 +199,35 @@ router.post("/verify-otp", verifyOTP)
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - email
  *             properties:
  *               email:
  *                 type: string
  *                 format: email
+ *                 description: Either email or phone is required (but not both)
+ *                 example: user@example.com
+ *               phone:
+ *                 type: string
+ *                 description: Either email or phone is required (but not both)
+ *                 example: "+1234567890"
  *     responses:
  *       200:
- *         description: Reset OTP sent if email exists
+ *         description: Reset OTP sent if account exists
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     resetToken:
+ *                       type: string
+ *       400:
+ *         description: Either email or phone required
  */
 router.post("/forgot-password", forgotPassword)
 
@@ -148,11 +250,14 @@ router.post("/forgot-password", forgotPassword)
  *             properties:
  *               resetToken:
  *                 type: string
+ *                 example: "a1b2c3d4e5f6..."
  *               otp:
  *                 type: string
+ *                 example: "123456"
  *               newPassword:
  *                 type: string
  *                 minLength: 6
+ *                 example: "newpassword123"
  *     responses:
  *       200:
  *         description: Password reset successfully
