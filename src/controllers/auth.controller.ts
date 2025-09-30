@@ -63,14 +63,14 @@ export const signup = async (req: Request, res: Response) => {
     const otp = generateOTP()
     const otpExpiry = new Date(Date.now() + OTP_EXPIRY)
 
-    // Create user with only email/phone and password - using snake_case for database columns
+    // Create user with only email/phone and password 
     const userData: any = {
       password: hashedPassword,
       otp,
-      otp_expiry: otpExpiry, // Changed to snake_case
-      is_verified: false,    // Changed to snake_case
-      created_at: new Date(), // Changed to snake_case
-      updated_at: new Date(), // Changed to snake_case
+      otp_expiry: otpExpiry, 
+      is_verified: false,    
+      created_at: new Date(), 
+      updated_at: new Date(), 
     }
 
     if (email) {
@@ -146,8 +146,8 @@ export const login = async (req: Request, res: Response) => {
       })
     }
 
-    // Check if user is verified - use snake_case for database column
-    if (!user.is_verified) { // Changed to snake_case
+    // Check if user is verified 
+    if (!user.is_verified) { 
       return res.status(403).json({
         success: false,
         message: "Please verify your account first",
@@ -157,10 +157,10 @@ export const login = async (req: Request, res: Response) => {
     // Generate token
     const token = generateToken(user.id)
 
-    // Update last login - using snake_case
+    // Update last login 
     await db("user").where({ id: user.id }).update({
-      last_login: new Date(), // Changed to snake_case
-      updated_at: new Date(), // Changed to snake_case
+      last_login: new Date(), 
+      updated_at: new Date(), 
     })
 
     res.json({
@@ -172,7 +172,7 @@ export const login = async (req: Request, res: Response) => {
           id: user.id,
           email: user.email,
           phone: user.phone,
-          isVerified: user.is_verified, // Changed to snake_case
+          isVerified: user.is_verified, 
         },
       },
     })
@@ -228,8 +228,8 @@ export const verifyOTP = async (req: Request, res: Response) => {
       })
     }
 
-    // Check OTP expiry - using snake_case
-    if (new Date() > new Date(user.otp_expiry)) { // Changed to snake_case
+    // Check OTP expiry 
+    if (new Date() > new Date(user.otp_expiry)) { 
       return res.status(400).json({
         success: false,
         message: "OTP has expired",
@@ -238,10 +238,10 @@ export const verifyOTP = async (req: Request, res: Response) => {
 
     // Verify user - using snake_case
     await db("user").where({ id: user.id }).update({
-      is_verified: true, // Changed to snake_case
+      is_verified: true, 
       otp: null,
-      otp_expiry: null, // Changed to snake_case
-      updated_at: new Date(), // Changed to snake_case
+      otp_expiry: null, 
+      updated_at: new Date(), 
     })
 
     // Generate token
@@ -298,7 +298,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
     }
 
     if (!user) {
-      // Don't reveal if user exists or not
+      
       return res.json({
         success: true,
         message: "If the account exists, a password reset OTP has been sent",
@@ -310,12 +310,12 @@ export const forgotPassword = async (req: Request, res: Response) => {
     const otp = generateOTP()
     const otpExpiry = new Date(Date.now() + OTP_EXPIRY)
 
-    // Update user with reset token and OTP - using snake_case
+    // Update user with reset token and OTP 
     await db("user").where({ id: user.id }).update({
-      reset_token: resetToken, // Changed to snake_case
+      reset_token: resetToken, 
       otp,
-      otp_expiry: otpExpiry, // Changed to snake_case
-      updated_at: new Date(), // Changed to snake_case
+      otp_expiry: otpExpiry, 
+      updated_at: new Date(), 
     })
 
     // In production, send OTP via SMS/Email service
@@ -325,7 +325,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
       success: true,
       message: "If the account exists, a password reset OTP has been sent",
       data: {
-        resetToken, // In production, don't send this in response
+        resetToken, 
       },
     })
   } catch (error: any) {
@@ -350,8 +350,8 @@ export const resetPassword = async (req: Request, res: Response) => {
       })
     }
 
-    // Find user with reset token - using snake_case
-    const user = await db("user").where({ reset_token: resetToken }).first() // Changed to snake_case
+    // Find user with reset token 
+    const user = await db("user").where({ reset_token: resetToken }).first() 
     if (!user) {
       return res.status(400).json({
         success: false,
@@ -367,8 +367,8 @@ export const resetPassword = async (req: Request, res: Response) => {
       })
     }
 
-    // Check OTP expiry - using snake_case
-    if (new Date() > new Date(user.otp_expiry)) { // Changed to snake_case
+    // Check OTP expiry 
+    if (new Date() > new Date(user.otp_expiry)) { 
       return res.status(400).json({
         success: false,
         message: "OTP has expired",
@@ -378,13 +378,13 @@ export const resetPassword = async (req: Request, res: Response) => {
     // Hash new password
     const hashedPassword = await bcrypt.hash(newPassword, 10)
 
-    // Update password and clear reset fields - using snake_case
+    
     await db("user").where({ id: user.id }).update({
       password: hashedPassword,
-      reset_token: null, // Changed to snake_case
+      reset_token: null, 
       otp: null,
-      otp_expiry: null, // Changed to snake_case
-      updated_at: new Date(), // Changed to snake_case
+      otp_expiry: null, 
+      updated_at: new Date(), 
     })
 
     res.json({

@@ -4,7 +4,7 @@ import cors from "cors";
 import swaggerUi from "swagger-ui-express";
 import swaggerJsdoc from "swagger-jsdoc";
 
-import apiRoutes from "./routes/index"; // ✅ this mounts all auto-generated routes
+import apiRoutes from "./routes/index"; 
 
 const app = express();
 
