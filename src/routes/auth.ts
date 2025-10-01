@@ -1,5 +1,5 @@
 import { Router } from "express"
-import { signup, login, verifyOTP, forgotPassword, resetPassword } from "../controllers/auth.controller"
+import { signup, login,verifyAccount, forgotPassword, resetPassword } from "../controllers/auth.controller"
 
 const router = Router()
 
@@ -185,7 +185,7 @@ router.post("/login", login)
  *       404:
  *         description: User not found
  */
-router.post("/verify-otp", verifyOTP)
+router.post("/verify-otp", verifyAccount)
 
 /**
  * @openapi
